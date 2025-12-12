@@ -1,0 +1,347 @@
+{
+  "name": "YT Agent using Veo3.1",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-fast-generate-preview:predictLongRunning",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyBKWF5wTGEXrLxWjeaQ2YLf6_o6CneiI-s"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"instances\": [\n    {\n      \"prompt\": \"{{ $json.veo }}\"\n    }\n  ],\n  \"parameters\": {\n      \"aspectRatio\": \"9:16\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "7d881fc7-7971-4e39-90c9-3c05143e8298",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "=https://generativelanguage.googleapis.com/v1beta/{{ $json.name }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyBKWF5wTGEXrLxWjeaQ2YLf6_o6CneiI-s"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "c8e62dbe-b1cb-4870-b609-ae03d01e1eed",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.response.generateVideoResponse.generatedSamples[0].video.uri }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyBKWF5wTGEXrLxWjeaQ2YLf6_o6CneiI-s"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          },
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "dialogue_example.mp4"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1552,
+        -16
+      ],
+      "id": "38b4d547-f58e-4ef2-8a04-4ddf84b0c9f2",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "1edc1bae-54fa-497d-a634-e6c51b6e19b9",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Please give me a new prompt every time.",
+        "options": {
+          "systemMessage": "=You are a professional AI video creative director and voice scriptwriter for a viral motivational YouTube Shorts channel. Your job is to generate a single, ready-to-paste Veo 3.1 prompt that includes both the cinematic video description and the motivational voiceover script for text-to-speech. The video must be under 8 seconds, fully ready to upload without any editing.\\n\\nStrict format to follow:\\n{\\n  \\\"title\\\": \\\"Catchy, viral YouTube short title (max 5 words)\\\",\\n  \\\"veo_prompt\\\": \\\"Cinematic, realistic description of the entire 8-second scene, including camera angles, environment, emotions, lighting, and timing cues. Embed the motivational voiceover text inside quotes and prefix with 'Voiceover:' so Veo generates synced speech automatically.\\\",\\n  \\\"voice_style\\\": \\\"Describe the ideal voice tone (e.g., deep cinematic male, calm female, heroic, emotional, etc.)\\\",\\n  \\\"music\\\": \\\"Describe background score mood (e.g., epic, uplifting, emotional piano, powerful drums)\\\"\\n}\\n\\nRules:\\n1. The voiceover line must be emotionally powerful, under 8 seconds when spoken.\\n2. Make the line fresh and bold, not generic — aim for scroll-stopping virality.\\n3. The visuals and speech must sync naturally (e.g., camera zooms as speech intensifies).\\n4. Use cinematic realism — avoid cartoon or generic scenes.\\n5. The final output should look like an instantly viral YouTube motivational short.\\n\\nExample output:\\n{\\n  \\\"title\\\": \\\"Prove Them Wrong\\\",\\n  \\\"veo_prompt\\\": \\\"A man training alone in a dark gym, camera slowly circling as sweat glistens under a single spotlight. Dramatic dust particles floating in air, cinematic lens flare. As the music rises, show him lifting one last heavy rep. Voiceover: 'They laughed at you... now make them remember your name.'\\\",\\n  \\\"voice_style\\\": \\\"Deep cinematic male with intensity\\\",\\n  \\\"music\\\": \\\"Epic bass build-up with dramatic strings\\\"\\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        0
+      ],
+      "id": "863c1daf-8392-4a18-8f14-37566aa0cf52",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        16,
+        192
+      ],
+      "id": "18711f07-c958-43fe-a5c6-e7d6480f4728",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zSUcJq9glKsY9Xq1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.output;\n\n// Parse the nested JSON safely\nlet parsedData;\ntry {\n  parsedData = JSON.parse(input);\n} catch (error) {\n  throw new Error(\"Failed to parse JSON: \" + error.message);\n}\n\n// Extract title and veo_prompt\nconst title = parsedData.title || \"\";\nconst veo = parsedData.veo_prompt || \"\";\n\n// Return them as separate outputs\nreturn [\n  {\n    json: {\n      title,\n      veo\n    }\n  }\n];\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        0
+      ],
+      "id": "6325e102-4a22-4cd3-b452-69ce9aab1329",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3efd00b4-62ba-430d-8ba3-41db84055530",
+              "leftValue": "={{ $json.toJsonString() }}",
+              "rightValue": "done",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1152,
+        0
+      ],
+      "id": "cfc1fb0e-89d8-46ca-9719-cfd7554dcea4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $node[\"Code in JavaScript\"].json.title }}",
+        "regionCode": "IN",
+        "categoryId": "27",
+        "binaryProperty": "dialogue_example.mp4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        -16
+      ],
+      "id": "7b3a74b0-ce75-49c0-a529-3b6c329ee3f0",
+      "name": "Upload a video",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "l3JHhbrv3g18qYgU",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        144
+      ],
+      "id": "19a4f3de-1127-4d1a-9b8d-d6d109fe5085",
+      "name": "Wait",
+      "webhookId": "1145c52c-9117-4435-9640-87ec9ecb1c9e"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Upload a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "45f8b706-2041-46e9-a26a-3944c3e9bcd0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "150a3ee1a023565209e7f7f988b89f1a1dccf72604c1039816143b38550f0710"
+  },
+  "id": "nNFRiFb3u6lPrQlB",
+  "tags": []
+}
